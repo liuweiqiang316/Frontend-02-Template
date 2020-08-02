@@ -1,4 +1,5 @@
 const net = require('net')
+const images = require('images')
 const parser = require('./parser.js')
 
 class Request {
@@ -20,7 +21,7 @@ class Request {
     }
     send(connection) {
         return new Promise((resolve, reject) => {
-            const parser = new ResponseParser()
+            const responseParser = new ResponseParser()
             if (connection) {
                 connection.write(this.toString())
             } else {
@@ -35,9 +36,9 @@ class Request {
                 connection.end()
             })
             connection.on('data', data => {
-                parser.receive(data.toString())
-                if (parser.isFinished) {
-                    resolve(parser.response)
+                responseParser.receive(data.toString())
+                if (responseParser.isFinished) {
+                    resolve(responseParser.response)
                     connection.end()
                 }
             })
@@ -70,10 +71,10 @@ class ResponseParser {
         this.headerValue = ''
         this.bodyParser = null
     }
-    get isFinished(){
+    get isFinished() {
         return this.bodyParser && this.bodyParser.isFinished
     }
-    get response(){
+    get response() {
         this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([\s\S]+)/)
         return {
             statusCode: RegExp.$1,
@@ -159,23 +160,40 @@ class TrunkedBodyParser {
                 this.length += parseInt(c, 16)
             }
         } else if (this.current === this.WAITING_LENGTH_LINE_END) {
-            if(c === '\n'){
+            if (c === '\n') {
                 this.current = this.READING_TRUNK
             }
-        } else if(this.current === this.READING_TRUNK){
+        } else if (this.current === this.READING_TRUNK) {
             this.content.push(c)
             this.length--
-            if(this.length === 0){
+            if (this.length === 0) {
                 this.current = this.WAITING_NEW_LINE
             }
-        }else if(this.current === this.WAITING_NEW_LINE){
-            if(c === '\r'){
+        } else if (this.current === this.WAITING_NEW_LINE) {
+            if (c === '\r') {
                 this.current = this.WAITING_NEW_LINE_END
             }
-        }else if(this.current === this.WAITING_NEW_LINE_END){
-            if(c === '\n'){
+        } else if (this.current === this.WAITING_NEW_LINE_END) {
+            if (c === '\n') {
                 this.current = this.WAITING_LENGTH
             }
+        }
+    }
+}
+
+function render(viewport, element) {
+    if (element.style) {
+        const img = images(element.style.width, element.style.height)
+        if (element.style['background-color']) {
+            let color = element.style['background-color'] || 'rgb(0,0,0)'
+            color.match(/rgb\((\d+),(\d+),(\d+)\)/)
+            img.fill(Number(RegExp.$1), Number(RegExp.$2), Number(RegExp.$3))
+            viewport.draw(img, element.style.left || 0, element.style.top || 0)
+        }
+    }
+    if (element.children) {
+        for (const child of element.children) {
+            render(viewport, child)
         }
     }
 }
@@ -197,5 +215,7 @@ void async function () {
     const request = new Request(options)
     const response = await request.send()
     const dom = parser.parserHTML(response.body)
-    console.log('dom: ', dom)
+    const viewport = images(800, 600)
+    render(viewport, dom)
+    viewport.save('viewport.jpg')
 }()

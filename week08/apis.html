@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>window apis</title>
+</head>
+<script>
+    // window apis
+    let names = Object.getOwnPropertyNames(window)
+    // ecma api 
+    let arr = [
+        'globalThis',
+        'Infinity',
+        'NaN',
+        'undefined',
+        'eval',
+        'isFinite',
+        'isNaN',
+        'parseFloat',
+        'parseInt',
+        'encodeURI',
+        'decodeURI',
+        'encodeURIComponent',
+        'decodeURIComponent',
+        'Array',
+        'ArrayBuffer',
+        'BigInt',
+        'BigInt64Array',
+        'BigUint64Array',
+        'Boolean',
+        'DataView',
+        'Date',
+        'Error',
+        'EvalError',
+        'Float32Array',
+        'Float64Array',
+        'Function',
+        'Int8Array',
+        'Int16Array',
+        'Int32Array',
+        'Map',
+        'Number',
+        'Object',
+        'Promise',
+        'Proxy',
+        'RangeError',
+        'ReferenceError',
+        'RegExp',
+        'Set',
+        'SharedArrayBuffer',
+        'String',
+        'Symbol',
+        'SyntaxError',
+        'TypeError',
+        'Uint8Array',
+        'Uint8ClampedArray',
+        'Uint16Array',
+        'Uint32Array',
+        'URIError',
+        'WeakMap',
+        'WeakSet',
+        'Atomics',
+        'JSON',
+        'Math',
+        'Reflect',
+    ]
+    names = filter(names, arr)
+    // console
+    names = names.filter(e => e !== 'console')
+    // Node
+    names = names.filter(e => {
+        try{
+            return !(window[e].prototype instanceof Node)
+        }catch(e){
+            return true
+        }
+    }).filter(e => e !== 'Node')
+    // events
+    names = names.filter(e => !e.match(/^on/))
+    // webkit
+    names = names.filter(e => !e.match(/^webkit/))
+    // window
+    arr = [
+        'window',
+        'self',
+        'document',
+        'name',
+        'location',
+        'history',
+        'customElements',
+        'locationbar',
+        'menubar',
+        'personalbar',
+        'scrollbars',
+        'statusbar',
+        'toolbar',
+        'status',
+        'close',
+        'closed',
+        'stop',
+        'focus',
+        'blur',
+        'frames',
+        'length',
+        'top',
+        'opener',
+        'parent',
+        'frameElement',
+        'open',
+        'navigator',
+        'applicationCache',
+        'originIsolated',
+        'alert',
+        'confirm',
+        'prompt',
+        'print',
+        'postMessage',
+        'GlobalEventHandlers',
+        'WindowEventHandlers',
+    ]
+    names = filter(names, arr)
+    // interfaces
+    arr = [
+        'ApplicationCache',
+        'External',
+        'Example',
+        'AudioTrackList',
+        'AudioTrack',
+        'VideoTrackList',
+        'VideoTrack',
+        'TextTrackList',
+        'TextTrack',
+        'TextTrackCueList',
+        'TextTrackCue',
+        'TimeRanges',
+        'TrackEvent',
+        'ValidityState',
+        'SubmitEvent',
+        'FormDataEvent',
+        'CanvasRenderingContext2D',
+        'CustomElementRegistry',
+        'ElementInternals',
+        'DataTransfer',
+        'DataTransferItemList',
+        'DataTransferItem',
+        'DragEvent',
+        'BarProp',
+        'History',
+        'Location',
+        'PopStateEvent',
+        'HashChangeEvent',
+        'PageTransitionEvent',
+        'BeforeUnloadEvent',
+        'DOMParser',
+        'Navigator',
+        'PluginArray',
+        'MimeTypeArray',
+        'Plugin',
+        'MimeType',
+        'SharedWorker',
+        'Storage',
+        'StorageEvent',
+    ]
+    names = filter(names, arr)
+    // Intel
+    names = names.filter(e => e !== 'Intl')
+    // WebGL
+    arr = [
+        'WebGLQuery',
+        'WebGLSampler',
+        'WebGLSync',
+        'WebGLTransformFeedback',
+        'WebGLVertexArrayObject',
+        'WebGLRenderingContext',
+        'WebGL2RenderingContext',
+        'WebGLContextEvent',
+        'WebGLContextAttributes',
+        'WebGLObject',
+        'WebGLBuffer',
+        'WebGLFramebuffer',
+        'WebGLProgram',
+        'WebGLRenderbuffer',
+        'WebGLShader',
+        'WebGLTexture',
+        'WebGLUniformLocation',
+        'WebGLActiveInfo',
+        'WebGLShaderPrecisionFormat',
+        'ArrayBuffer',
+        'WebGLContextEvent',
+        'WebGLRenderingContextBase',
+        'WebGLRenderingContextOverloads',
+    ]
+    names = filter(names, arr)
+    arr = [
+        'BaseAudioContext',
+        'AudioContext',
+        'OfflineAudioContext',
+        'AudioBuffer',
+        'AudioNode',
+        'AudioParam',
+        'AudioScheduledSourceNode',
+        'AnalyserNode',
+        'AudioBufferSourceNode',
+        'AudioDestinationNode',
+        'AudioListener',
+        'AudioProcessingEvent',
+        'BiquadFilterNode',
+        'ChannelMergerNode',
+        'ChannelSplitterNode',
+        'ConstantSourceNode',
+        'ConvolverNode',
+        'DelayNode',
+        'DynamicsCompressorNode',
+        'GainNode',
+        'IIRFilterNode',
+        'MediaElementAudioSourceNode',
+        'MediaStreamAudioDestinationNode',
+        'MediaStreamAudioSourceNode',
+        'MediaStreamTrackAudioSourceNode',
+        'OscillatorNode',
+        'PannerNode',
+        'PeriodicWave',
+        'ScriptProcessorNode',
+        'StereoPannerNode',
+        'WaveShaperNode',
+        'AudioWorklet',
+    ]
+    names = filter(names, arr)
+    arr = [
+        'TextEncoder',
+        'TextEncoder',
+        'TextDecoderStream',
+        'TextDecoderStream',
+    ]
+    names = filter(names, arr)
+    arr = [
+        'ReadableStream',
+        'ReadableStreamDefaultReader',
+        'ReadableStreamBYOBReader',
+        'ReadableStreamDefaultController',
+        'ReadableByteStreamController',
+        'ReadableStreamBYOBRequest',
+        'WritableStream',
+        'WritableStreamDefaultWriter',
+        'WritableStreamDefaultController',
+        'TransformStream',
+        'TransformStreamDefaultController',
+        'ByteLengthQueuingStrategy',
+        'CountQueuingStrategy',
+    ]
+    names = filter(names, arr)
+    arr = ['SyncManager']
+    names = filter(names, arr)
+    // DOM whatwg
+    arr = [
+        'Event',
+        'Window',
+        'CustomEvent',
+        'EventTarget',
+        'AbortController',
+        'AbortSignal',
+        'NonElementParentNode',
+        'DocumentOrShadowRoot',
+        'ParentNode',
+        'NonDocumentTypeChildNode',
+        'ChildNode',
+        'Slottable',
+        'NodeList',
+        'HTMLCollection',
+        'MutationObserver',
+        'MutationRecord',
+        'Node',
+        'Document',
+        'DOMImplementation',
+        'DocumentType',
+        'DocumentFragment',
+        'ShadowRoot',
+        'Element',
+        'NamedNodeMap',
+        'Attr',
+        'CharacterData',
+        'Text',
+        'CDATASection',
+        'ProcessingInstruction',
+        'Comment',
+        'AbstractRange',
+        'StaticRange',
+        'Range',
+        'NodeIterator',
+        'TreeWalker',
+        'NodeFilter',
+        'DOMTokenList',
+        'XPathResult',
+        'XPathExpression',
+        'XPathEvaluatorBase',
+        'XPathEvaluator',
+        'MutationEvent',
+        'MutationNameEvent',
+        'DOMConfiguration',
+        'DOMError',
+        'DOMErrorHandler',
+        'DOMImplementationList',
+        'DOMImplementationSource',
+        'DOMLocator',
+        'DOMObject',
+        'DOMUserData',
+        'Entity',
+        'EntityReference',
+        'NameList',
+        'Notation',
+        'TypeInfo',
+        'UserDataHandler',
+    ]
+    names = filter(names, arr)
+    // fetch whatwg
+    arr = [
+        'fetch',
+        'Headers',
+        'Body',
+        'Request',
+        'Response',
+        'Fetch',
+        'Garbage',
+    ]
+    names = filter(names, arr)
+    // Notification whatwg
+    arr = [
+        'Notification',
+        'ServiceWorkerRegistration',
+    ]
+    names = filter(names, arr)
+    // Storage whatwg
+    arr = [
+        'StorageManager',
+        'caches',
+        'indexedDB',
+        'localStorage',
+        'serviceWorkerRegistrations',
+        'sessionStorage',
+    ]
+    names = filter(names, arr)
+    // XMLHttpRequest whatwg
+    arr = [
+        'XMLHttpRequest',
+        'XMLHttpRequestEventTarget',
+        'XMLHttpRequestResponseType',
+        'XMLHttpRequestUpload',
+        'FormData',
+        'ProgressEvent',
+    ]
+    names = filter(names, arr)
+    // CSSOM
+    arr = [
+        'CSS',
+        'StyleSheet',
+        'CSSStyleSheet',
+        'StyleSheetList',
+        'CSSRuleList',
+        'CSSRule',
+        'CSSStyleRule',
+        'CSSImportRule',
+        'CSSGroupingRule',
+        'CSSMediaRule',
+        'CSSPageRule',
+        'CSSMarginRule',
+        'CSSNamespaceRule',
+        'CSSStyleDeclaration',
+        'getComputedStyle',
+        'escape',
+        'CSSConditionRule',
+        'CSSSupportsRule',
+    ]
+    names = filter(names, arr)
+    // CSS Animation
+    arr = [
+        'AnimationEvent',
+        'CSSKeyframeRule',
+        'CSSKeyframesRule',
+    ]
+    names = filter(names, arr)
+    console.log(names)
+
+    function filter(names, arr){
+        let set = new Set()
+        arr.forEach(e => set.add(e))
+        return names.filter(e => !set.has(e))
+    }
+</script>
+
+<body>
+</body>
+
+</html>

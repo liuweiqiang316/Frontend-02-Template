@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rgy</title>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            border-radius: 100px;
+            background-color: grey;
+        }
+
+        .r.light {
+            background-color: red;
+        }
+
+        .g.light {
+            background-color: green;
+        }
+
+        .y.light {
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="r"></div>
+    <div class="g"></div>
+    <div class="y"></div>
+    <script>
+        function sleep(t) {
+            return new Promise((resolve) => setTimeout(() => {
+                resolve()
+            }, t))
+        }
+
+        function red() {
+            const lights = [...document.getElementsByTagName('div')]
+            for (const light of lights) {
+                light.classList.remove('light')
+            }
+            document.getElementsByClassName('r')[0].classList.add('light')
+        }
+        function green() {
+            const lights = [...document.getElementsByTagName('div')]
+            for (const light of lights) {
+                light.classList.remove('light')
+            }
+            document.getElementsByClassName('g')[0].classList.add('light')
+        }
+        function yellow() {
+            const lights = [...document.getElementsByTagName('div')]
+            for (const light of lights) {
+                light.classList.remove('light')
+            }
+            document.getElementsByClassName('y')[0].classList.add('light')
+        }
+
+        async function rgy() {
+            while (true) {
+                green()
+                await sleep(10000)
+                yellow()
+                await sleep(2000)
+                red()
+                await sleep(5000)
+            }
+        }
+
+        rgy()
+    </script>
+</body>
+
+</html>

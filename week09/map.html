@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>map</title>
+    <style>
+        .cell {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: grey;
+            vertical-align: top;
+            border-bottom: 1px solid white;
+            border-right: 1px solid white;
+        }
+        #container {
+            width: 701px;
+            line-height: 7px;
+            font-size: 0;/* 解决地图网格间距过大 */
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <button onclick="localStorage.setItem('map', JSON.stringify(map))">保存</button>
+    <script>
+        let map = localStorage.getItem('map') ? JSON.parse(localStorage.getItem('map')) : Array(10000).fill(0)
+        let container = document.getElementById('container')
+        for (let y = 0; y < 100; y++) {
+            for (let x = 0; x < 100; x++) {
+                let cell = document.createElement('div')
+                cell.classList.add('cell')
+                if(map[100*y + x] == 1) cell.style.backgroundColor = 'black'
+                cell.addEventListener('mousemove', () => {
+                    if(mousedown){
+                        if(clear){
+                            cell.style.backgroundColor = ''
+                            map[100*y + x] = 0
+                        }else{
+                            cell.style.backgroundColor = 'black'
+                            map[100*y + x] = 1
+                        }
+                    }
+                })
+                container.appendChild(cell)
+            }
+        }
+        let mousedown = false
+        let clear = false
+        document.addEventListener('mousedown', e => {
+            mousedown = true
+            clear = e.which === 3
+        })
+        document.addEventListener('mouseup', () => mousedown = false)
+        document.addEventListener('contextmenu', e => e.preventDefault())
+
+        function path(map, start, end) {
+            
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<script>
+    const reg = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g
+    const dictionary = ["Number", "Whitespace", "LineTerminator", "*", "/", "+", "-"]
+
+    function* tokenize(source) {
+        let result = null
+        let lastIndex = 0
+        while (true) {
+            lastIndex = reg.lastIndex
+            result = reg.exec(source)
+            if (!result) break
+            if (reg.lastIndex - lastIndex > result[0].length) break
+            let token = {
+                type: null,
+                value: null
+            }
+            for (let i = 1; i <= dictionary.length; i++) {
+                if (result[i]) token.type = dictionary[i - 1]
+            }
+            token.value = result[0]
+            yield token
+        }
+    }
+    let source = []
+    let str = "1024 + 10 * 25"
+    // let str = "1 + 2 * 5 + 3"
+    for (let token of tokenize(str)) {
+        if (token.type !== "Whitespace" && token.type !== "LineTerminator")
+            source.push(token)
+    }
+    source.push({ type: "EOF" })
+
+    function expression(source) {
+        if (source[0].type === "additiveExpression" && source[1] && source[1].type === "EOF") {
+            let node = {
+                type: "expression",
+                children: [source.shift(), source.shift()]
+            }
+            source.unshift(node)
+            return node
+        }
+        additiveExpression(source)
+        return expression(source)
+    }
+    function additiveExpression(source) {
+        if (source[0].type === "multicativeExpression") {
+            let node = {
+                type: "additiveExpression",
+                children: [source[0]]
+            }
+            source[0] = node
+            return additiveExpression(source)
+        }
+        if (source[0].type === "additiveExpression" && source[1] && source[1].type === "+") {
+            let node = {
+                type: "additiveExpression",
+                operator: "+",
+                children: []
+            }
+            node.children.push(source.shift())
+            node.children.push(source.shift())
+            multicativeExpression(source)
+            node.children.push(source.shift())
+            source.unshift(node)
+            return additiveExpression(source)
+        }
+        if (source[0].type === "additiveExpression" && source[1] && source[1].type === "-") {
+            let node = {
+                type: "additiveExpression",
+                operator: "-",
+                children: []
+            }
+            node.children.push(source.shift())
+            node.children.push(source.shift())
+            multicativeExpression(source)
+            node.children.push(source.shift())
+            source.unshift(node)
+            return additiveExpression(source)
+        }
+        if (source[0].type === "additiveExpression") {
+            return source[0]
+        }
+        multicativeExpression(source)
+        return additiveExpression(source)
+    }
+    function multicativeExpression(source) {
+        if (source[0].type === "Number") {
+            let node = {
+                type: "multicativeExpression",
+                children: [source[0]]
+            }
+            source[0] = node
+            return multicativeExpression(source)
+        }
+        if (source[0].type === "multicativeExpression" && source[1] && source[1].type === "*") {
+            let node = {
+                type: "multicativeExpression",
+                operator: "*",
+                children: []
+            }
+            node.children.push(source.shift())
+            node.children.push(source.shift())
+            node.children.push(source.shift())
+            source.unshift(node)
+            return multicativeExpression(source)
+        }
+        if (source[0].type === "multicativeExpression" && source[1] && source[1].type === "/") {
+            let node = {
+                type: "multicativeExpression",
+                operator: "/",
+                children: []
+            }
+            node.children.push(source.shift())
+            node.children.push(source.shift())
+            node.children.push(source.shift())
+            source.unshift(node)
+            return multicativeExpression(source)
+        }
+        if (source[0].type === "multicativeExpression") {
+            return source[0]
+        }
+        return multicativeExpression(source)
+    }
+    console.log(expression(source))
+</script>

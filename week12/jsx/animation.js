@@ -98,8 +98,10 @@ export class Animation {
         this.template = template || (v => v)
     }
     receive(time) {
+        // range可以代表动画的范围
         let range = this.endValue - this.startValue
-        let progress = this.timeingFunction(time / this.duration)
-        this.object[this.property] = this.template(this.startValue + range * progress)
+        let progress = this.timeingFunction(time / this.duration)// progress可以代表在时间的维度上，整个动画所处的时刻
+        this.object[this.property] = this.template(this.startValue + range * progress)// 通过template模板函数，将动画所处的时刻映射到动画所作用的对象的对应的属性上
+        // 以上过程连续起来就组成了动画
     }
 }

@@ -1,7 +1,11 @@
 const path = require('path')
 
 module.exports = {
-    entry: './main.js',
+    // entry: [
+    //     './main.js',
+    //     './animation-demo.js',
+    // ],
+    entry: './animation-demo.js',
     module: {
         rules: [
             {

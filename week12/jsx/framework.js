@@ -3,17 +3,25 @@ function createElement(type, attributes, ...children) {
     if (typeof type === 'string')
         element = new ElementWrapper(type)
     else
-        element = new type
+        element = new type({ attributes, children })
+
 
     for (let name in attributes) {
         element.setAttribute(name, attributes[name])
     }
-    for (let child of children) {
-        if (typeof child === 'string') {
-            child = new TextWrapper(child)
+    let processChildren = children => {
+        for (let child of children) {
+            if ((typeof child === 'object' && (child instanceof Array))) {
+                processChildren(child)
+                continue
+            }
+            if (typeof child === 'string') {
+                child = new TextWrapper(child)
+            }
+            element.appendChild(child.root)
         }
-        child.mountTo(element)
     }
+    processChildren(children)
     return element
 }
 
@@ -23,8 +31,13 @@ export const ATTRIBUTE = Symbol('attribute')
 class Component {
     constructor(type) {
         this.root = this.render(type)
-        this[ATTRIBUTE] = Object.create(null)
+        if (!this[ATTRIBUTE])
+            this[ATTRIBUTE] = Object.create(null)
         this[STATE] = Object.create(null)
+    }
+
+    render(type) {
+        return document.createElement(type)
     }
 
     setAttribute(name, value) {

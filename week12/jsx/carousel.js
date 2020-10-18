@@ -9,13 +9,10 @@ const PICTURE_WIDTH = 500
 
 class Carousel extends Component {
 
-    constructor() {
+    constructor(props) {
         super('div')
+        console.log('Carousel props', props)
         // this.attributes = Object.create(null)
-    }
-
-    render(type) {
-        return document.createElement(type)
     }
 
     appendChild(child) {

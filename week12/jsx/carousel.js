@@ -1,5 +1,9 @@
-import { Component } from './framework'
+import { Component, STATE, ATTRIBUTE } from './framework'
+import { enableGesture } from './gesture'
+import { Timeline, Animation } from './animation'
+import { ease } from './cubicBezier'
 
+export { STATE, ATTRIBUTE } from './framework'
 // 图片宽度
 const PICTURE_WIDTH = 500
 
@@ -7,15 +11,11 @@ class Carousel extends Component {
 
     constructor() {
         super('div')
-        this.attributes = Object.create(null)
+        // this.attributes = Object.create(null)
     }
 
     render(type) {
         return document.createElement(type)
-    }
-
-    setAttribute(name, value) {
-        this.attributes[name] = value
     }
 
     appendChild(child) {
@@ -23,72 +23,95 @@ class Carousel extends Component {
     }
 
     renderImg() {
-        const { attributes: { src }, root } = this
+        const { [ATTRIBUTE]: { src }, root } = this
         root.classList.add('carousel')
-        for (const dataurl of src) {
+        for (const data of src) {
             const child = document.createElement('div')
-            child.style.backgroundImage = `url(${dataurl})`
+            child.style.backgroundImage = `url(${data.img})`
             root.appendChild(child)
         }
+        enableGesture(root)
+        let tl = new Timeline
+        tl.start()
+        let handler = null
 
-        /* 手动轮播 */
-        let position = 0
-        root.addEventListener('mousedown', e => {
-            let { children } = root
-            let startX = e.clientX
-            let move = e => {
-                let x = e.clientX - startX
+        this[STATE].position = 0
 
-                let current = position - (x - x % PICTURE_WIDTH) / PICTURE_WIDTH
+        let { children } = root
+        let t = 0
+        let ax = 0 // 动画造成的x位移
 
-                for (let offset of [-1, 0, 1]) {
-                    let pos = current + offset
-                    pos = (pos + children.length) % children.length
-                    children[pos].style.transition = 'none'
-                    children[pos].style.transform = `translateX(${-pos * PICTURE_WIDTH + offset * PICTURE_WIDTH + x % PICTURE_WIDTH}px)`
-                }
+        root.addEventListener('start', e => {
+            tl.pause()
+            clearInterval(handler)
+            let progress = (Date.now() - t) / 500
+            ax = ease(progress) * 500 - 500
+        })
+        root.addEventListener('tap', e => {
+            this.triggerEvent('click', {
+                data: this[ATTRIBUTE].src[this[STATE].position],
+                position: this[STATE].position
+            })
+        })
+        root.addEventListener('panstart', e => {
+            let x = e.clientX - e.startX - ax
+
+            let current = this[STATE].position - (x - x % PICTURE_WIDTH) / PICTURE_WIDTH
+
+            for (let offset of [-1, 0, 1]) {
+                let pos = current + offset
+                pos = (pos % children.length + children.length) % children.length
+                children[pos].style.transition = 'none'
+                children[pos].style.transform = `translateX(${-pos * PICTURE_WIDTH + offset * PICTURE_WIDTH + x % PICTURE_WIDTH}px)`
             }
-            let up = e => {
-                let x = e.clientX - startX
-                position = position - Math.round(x / PICTURE_WIDTH)
-                /** 鼠标松开时判断拖动方向。*/
-                const direction = -Math.sign(Math.round(x / PICTURE_WIDTH) - x + PICTURE_WIDTH / 2 * Math.sign(x))
-                for (let offset of [0, direction]) {
-                    let pos = position + offset
-                    pos = (pos + children.length) % children.length
-                    children[pos].style.transition = ''
-                    children[pos].style.transform = `translateX(${-pos * PICTURE_WIDTH + offset * PICTURE_WIDTH}px)`
-                }
+        })
+        root.addEventListener('end', e => {
+            tl.reset()
+            tl.start()
+            handler = setInterval(nextPicture, 3000)
 
-                document.removeEventListener('mousemove', move)
-                document.removeEventListener('mouseup', up)
+            let x = e.clientX - e.startX - ax
+
+            let current = this[STATE].position - (x - x % PICTURE_WIDTH) / PICTURE_WIDTH
+
+            const direction = Math.round((x % 500) / 500)
+
+            if (e.isFlick) {
+                console.log('velocity', e.velocity)
             }
-            document.addEventListener('mousemove', move)
-            document.addEventListener('mouseup', up)
+            for (let offset of [-1, 0, 1]) {
+                let pos = current + offset
+                pos = (pos % children.length + children.length) % children.length
+                children[pos].style.transition = 'none'
+
+                tl.add(new Animation(children[pos].style, 'transform',
+                    -pos * PICTURE_WIDTH + offset * PICTURE_WIDTH + x % PICTURE_WIDTH,
+                    -pos * PICTURE_WIDTH + offset * PICTURE_WIDTH + direction * PICTURE_WIDTH, 500, 0, v => `translateX(${v}px)`, ease))
+            }
+            this[STATE].position = this[STATE].position - (x - x % PICTURE_WIDTH) / PICTURE_WIDTH - direction
+            this[STATE].position = (this[STATE].position % children.length + children.length) % children.length
+            this.triggerEvent('change', { position: this[STATE].position })
+
         })
 
-        /** 自动轮播 */
-        let currentIndex = 0
-        setInterval(() => {
+        let nextPicture = () => {
             let { children } = root
-            currentIndex = currentIndex % children.length
-            let current = children[currentIndex]
+            let current = children[this[STATE].position]
 
-            let nextIndex = (currentIndex + 1) % children.length
+            let nextIndex = (this[STATE].position + 1) % children.length
             let next = children[nextIndex]
-            next.style.transition = 'none'
-            next.style.transform = `translateX(${100 - nextIndex * 100}%)`
-            setTimeout(() => {
-                next.style.transition = ''
-                current.style.transform = `translateX(${-100 - currentIndex * 100}%)`
-                next.style.transform = `translateX(${- nextIndex * 100}%)`
-                currentIndex = nextIndex
-            }, 16)
 
-            for (const child of children) {
-                child.style.transform = `translateX(-${current * 100}%)`
-            }
-        }, 3000)
+            t = Date.now()
+
+            tl.add(new Animation(current.style, 'transform',
+                -this[STATE].position * 500, -500 - this[STATE].position * 500, 500, 0, v => `translateX(${v}px)`, ease))
+            tl.add(new Animation(next.style, 'transform',
+                500 - nextIndex * 500, - nextIndex * 500, 500, 0, v => `translateX(${v}px)`, ease))
+            this[STATE].position = nextIndex
+            this.triggerEvent('Change', { position: this[STATE].position })
+        }
+
+        handler = setInterval(nextPicture, 3000)
     }
 
     mountTo(parent) {

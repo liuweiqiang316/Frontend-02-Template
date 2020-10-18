@@ -17,12 +17,25 @@ function createElement(type, attributes, ...children) {
     return element
 }
 
+export const STATE = Symbol('state')
+export const ATTRIBUTE = Symbol('attribute')
+
 class Component {
     constructor(type) {
         this.root = this.render(type)
+        this[ATTRIBUTE] = Object.create(null)
+        this[STATE] = Object.create(null)
     }
+
+    setAttribute(name, value) {
+        this[ATTRIBUTE][name] = value
+    }
+
     mountTo(parent) {
         parent.appendChild(this.root)
+    }
+    triggerEvent(type, args) {
+        this[ATTRIBUTE]['on' + type.replace(/^[\s\S]/, s => s.toUpperCase())](new CustomEvent(type, { detail: args }))
     }
 }
 

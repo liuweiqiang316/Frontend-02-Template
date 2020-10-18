@@ -5,7 +5,8 @@ module.exports = {
     //     './main.js',
     //     './animation-demo.js',
     // ],
-    entry: './animation-demo.js',
+    // entry: './animation-demo.js',
+    entry: './main.js',
     module: {
         rules: [
             {

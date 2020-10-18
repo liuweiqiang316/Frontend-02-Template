@@ -1,4 +1,5 @@
 import { linear } from './cubicBezier'
+import { entry } from './webpack.config'
 const TICK = Symbol('tick')
 const TICK_HANDLER = Symbol('tick-handler')
 const ANIMATIONS = Symbol('animations')
@@ -40,6 +41,7 @@ export class Timeline {
         this[TICK]()
     }
     pause() {
+        console.log('pause', this[STATE])
         if (this[STATE] !== 'started') return
         this[STATE] = 'paused'
 

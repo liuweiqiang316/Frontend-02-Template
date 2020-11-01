@@ -14,6 +14,8 @@
 
 ### yeoman工具链集成
 
+1. 集成需要加上```babel-loader、@babel/preset-env```
+
 ### 问题:
 
 1. vscode断点调试没有调通,报mocha的错误```missing )```

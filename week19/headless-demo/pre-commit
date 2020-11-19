@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+const process = require('process')
+const { ESLint } = require("eslint")
+const child_process = require("child_process")
+
+function exec(name) {
+	return new Promise((resolve) => {
+		child_process.exec(name, resolve)
+	})
+}
+
+
+console.log('pre commit start: ');
+(async function main() {
+	// 1. Create an instance with the `fix` option.
+	const eslint = new ESLint({ fix: false })
+
+	await exec('git stash push -k')
+	// 2. Lint files. This doesn't modify target files.
+	const results = await eslint.lintFiles(["pre-commit-demo.js"])
+	await exec('git stash pop')
+
+	// 4. Format the results.
+	const formatter = await eslint.loadFormatter("stylish")
+	const resultText = formatter.format(results)
+
+	for (const result of results) {
+		if (result.errorCount) process.exitCode = 1
+	}
+
+	console.log(resultText)
+})().catch((error) => {
+	process.exitCode = 1
+	console.error(error)
+})
